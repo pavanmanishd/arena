@@ -1,7 +1,7 @@
 # Arena - High-Performance Memory Allocator for Go
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/yourusername/arena.svg)](https://pkg.go.dev/github.com/yourusername/arena)
-[![Go Report Card](https://goreportcard.com/badge/github.com/yourusername/arena)](https://goreportcard.com/report/github.com/yourusername/arena)
+[![Go Reference](https://pkg.go.dev/badge/github.com/pavanmanishd/arena.svg)](https://pkg.go.dev/github.com/pavanmanishd/arena)
+[![Go Report Card](https://goreportcard.com/badge/github.com/pavanmanishd/arena)](https://goreportcard.com/report/github.com/pavanmanishd/arena)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A production-ready, high-performance memory arena allocator for Go. Perfect for request-scoped allocations, reducing GC pressure, and applications requiring predictable memory allocation patterns.
@@ -19,7 +19,7 @@ A production-ready, high-performance memory arena allocator for Go. Perfect for 
 ## Installation
 
 ```bash
-go get github.com/yourusername/arena
+go get github.com/pavanmanishd/arena
 ```
 
 ## Quick Start
@@ -29,7 +29,7 @@ package main
 
 import (
     "fmt"
-    "github.com/yourusername/arena"
+    "github.com/pavanmanishd/arena"
 )
 
 func main() {
