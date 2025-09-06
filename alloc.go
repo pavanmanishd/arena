@@ -12,8 +12,8 @@ func Alloc[T any](a *Arena) *T {
 	size := int(unsafe.Sizeof(zero))
 	b := a.AllocBytes(size)
 	// Zero the memory
-	for i := range b {
-		b[i] = 0
+	if len(b) > 0 {
+		clear(b)
 	}
 	return (*T)(unsafe.Pointer(&b[0]))
 }
@@ -58,8 +58,8 @@ func AllocSliceZeroed[T any](a *Arena, n int) []T {
 	total := elemSize * n
 	b := a.AllocBytes(total)
 	// Zero the memory
-	for i := range b {
-		b[i] = 0
+	if len(b) > 0 {
+		clear(b)
 	}
 	return unsafe.Slice((*T)(unsafe.Pointer(&b[0])), n)
 }

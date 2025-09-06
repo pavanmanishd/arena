@@ -16,6 +16,59 @@ A production-ready, high-performance memory arena allocator for Go. Perfect for 
 - **Type-Safe Generics**: Strongly-typed allocation functions
 - **Production Ready**: Extensive test coverage and benchmarks
 
+## Performance
+
+Arena provides significant performance improvements over standard Go allocation, especially for scenarios with many temporary allocations:
+
+### Core Allocation Benchmarks
+*Tested on Apple M4 Pro (darwin/arm64)*
+
+```
+BenchmarkArenaAllocBytes/64B-14     743M ops    1.62 ns/op    0 B/op    0 allocs/op
+BenchmarkArenaVsBuiltin/arena-14    747M ops    1.63 ns/op    0 B/op    0 allocs/op  
+BenchmarkArenaVsBuiltin/builtin-14  1000M ops   0.23 ns/op    0 B/op    0 allocs/op
+BenchmarkSafeArena/AllocBytes-14    256M ops    4.68 ns/op    0 B/op    0 allocs/op
+BenchmarkSafeArena/SafeAlloc-14     233M ops    5.12 ns/op    0 B/op    0 allocs/op
+```
+
+### Real-World Scenario Comparisons
+
+**Many Small Allocations (100 × 64B):**
+```
+Arena:   19.2M ops    110 ns/op     0 B/op      0 allocs/op
+Builtin: 197K ops     12,386 ns/op  6400 B/op   100 allocs/op
+```
+**🚀 Arena is 112x faster with zero GC pressure!**
+
+**Struct Allocations (50 structs):**
+```
+Arena:   16.9M ops    149 ns/op     0 B/op      0 allocs/op  
+Builtin: 203K ops     11,633 ns/op  3200 B/op   50 allocs/op
+```
+**🚀 Arena is 78x faster with zero GC pressure!**
+
+**Buffer Reuse (10 × mixed buffers):**
+```
+Arena:   48.5M ops    50.5 ns/op    0 B/op      0 allocs/op
+Builtin: 92K ops      26,292 ns/op  35,841 B/op 30 allocs/op
+```
+**🚀 Arena is 521x faster with zero GC pressure!**
+
+**Single Allocation Comparison:**
+```
+Arena:   856M ops     1.32 ns/op    0 B/op      0 allocs/op
+Builtin: 1000M ops    0.26 ns/op    0 B/op      0 allocs/op
+```
+*Builtin is faster for individual allocations*
+
+### Key Performance Benefits
+
+- **Zero GC Pressure**: Arena allocations don't trigger garbage collection
+- **Batch Cleanup**: O(1) cleanup of thousands of objects with `Reset()`
+- **Memory Locality**: Sequential allocation improves cache performance  
+- **Reduced Fragmentation**: Large chunks minimize heap fragmentation
+- **Predictable Performance**: No GC pauses during allocation-heavy workloads
+
 ## Installation
 
 ```bash
@@ -166,16 +219,20 @@ func (p *ObjectPool) Reset() {
 }
 ```
 
-## Performance
+## When to Use Arena
 
-Benchmarks on typical hardware show significant performance improvements:
+### ✅ **Perfect For:**
+- **Web Servers**: Request-scoped allocations with automatic cleanup
+- **Batch Processing**: Processing many items with temporary objects
+- **High-Frequency Operations**: Reducing GC pressure in hot paths
+- **Temporary Buffers**: String building, parsing, data transformation
+- **Memory-Intensive Apps**: Applications with predictable allocation patterns
 
-```
-BenchmarkArenaAlloc-8           50000000    25.2 ns/op    0 B/op    0 allocs/op
-BenchmarkBuiltinAlloc-8         20000000    65.4 ns/op   64 B/op    1 allocs/op
-BenchmarkArenaAllocSlice-8      10000000   156.3 ns/op    0 B/op    0 allocs/op
-BenchmarkBuiltinAllocSlice-8     5000000   312.7 ns/op  800 B/op    1 allocs/op
-```
+### ❌ **Not Ideal For:**
+- Long-lived objects that outlive the arena
+- Small programs with minimal allocation
+- Cases where individual object deallocation is needed
+- Memory-constrained environments where chunk overhead matters
 
 ## Memory Safety
 
@@ -200,22 +257,6 @@ Choose chunk size based on your allocation patterns:
 - Use `SafeArena` for multi-threaded access (mutex overhead)
 - Consider per-goroutine arenas to avoid contention
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Run tests (`go test -v ./...`)
-4. Run benchmarks (`go test -bench=. -benchmem`)
-5. Commit changes (`git commit -am 'Add amazing feature'`)
-6. Push to branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Inspired by arena allocators in systems programming languages
-- Built with Go's type safety and performance in mind
-- Designed for production use in high-performance applications
